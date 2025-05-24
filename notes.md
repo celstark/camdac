@@ -30,3 +30,12 @@ Either activate it each time or `~/camilladsp/.venv/bin/python some_script.py` t
 # Testing
 sudo service shairport-sync restart
 speaker-test -D hw:Loopback,1 -c 2 -r 44100 -F S32_LE
+
+
+
+# Case
+The case came from [Pieterbos82](https://www.thingiverse.com/thing:4753525) on Thingiverse originally.  I took his SCAD code, fumbled my way through SCAD, and revised it.  Notably, I turned off the Neutrik / XLR bits, reworked the DAC HAT spacing for the IQAudio / RaspberyPi branded DAC boards, and added holes in the "front" for our controls.
+
+## To improve
+- You need to remove the SD card to get the board in and out.  1 mm more and we'd clear
+- Different knobs, 4 controls, or a bit bigger case -- it's a bit cramped
