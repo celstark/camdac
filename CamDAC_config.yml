@@ -1,0 +1,140 @@
+description: null
+devices:
+  adjust_period: null
+  capture:
+    channels: 2
+    device: hw:0
+    format: S32LE
+    labels: null
+    link_mute_control: null
+    link_volume_control: null
+    stop_on_inactive: null
+    type: Alsa
+  capture_samplerate: 44100
+  chunksize: 2048
+  enable_rate_adjust: true
+  multithreaded: null
+  playback:
+    channels: 2
+    device: hw:CARD=DAC,DEV=0
+    format: S32LE
+    type: Alsa
+  queuelimit: null
+  rate_measure_interval: null
+  resampler:
+    type: Synchronous
+  samplerate: 88200
+  silence_threshold: -120
+  silence_timeout: 3
+  stop_on_rate_change: null
+  target_level: null
+  volume_limit: null
+  volume_ramp_time: null
+  worker_threads: null
+filters:
+  Filt1:
+    description: Filter 1 for knob control
+    parameters:
+      freq: 100
+      gain: 0
+      q: 1
+      type: Lowshelf
+    type: Biquad
+  Filt2:
+    description: Filter 2 for knob control
+    parameters:
+      freq: 2000
+      gain: 0
+      q: 3
+      type: Peaking
+    type: Biquad
+  Filt3:
+    description: Filter 3 for knob control
+    parameters:
+      freq: 5000
+      gain: 0
+      q: 4
+      type: Peaking
+    type: Biquad
+  Filt4:
+    description: Filter 4 for knob control
+    parameters:
+      freq: 8000
+      gain: 0
+      q: 4
+      type: Peaking
+    type: Biquad
+  Filt5:
+    description: Filter 5 for knob control
+    parameters:
+      freq: 12000
+      gain: 0
+      q: 1
+      type: Highshelf
+    type: Biquad
+  LShelf:
+    description: Basic low-shelf -- example of filter that might always be active
+    parameters:
+      freq: 1000
+      gain: 0
+      q: 0.707
+      type: Lowshelf
+    type: Biquad
+  LVolume:
+    description: Left channel balance
+    parameters:
+      fader: Aux1
+      limit: null
+      ramp_time: null
+    type: Volume
+  RVolume:
+    description: Right channel balance
+    parameters:
+      fader: Aux2
+      limit: null
+      ramp_time: null
+    type: Volume
+mixers:
+  Unnamed Mixer 1:
+    channels:
+      in: 2
+      out: 2
+    description: null
+    labels: null
+    mapping:
+    - dest: 0
+      mute: false
+      sources:
+      - channel: 0
+        gain: 0
+        inverted: false
+        mute: false
+        scale: dB
+pipeline:
+- bypassed: null
+  channels: null
+  description: Filters sent to all channels - can include both knob-based and permanent
+  names:
+  - Filt1
+  - Filt2
+  - Filt3
+  - Filt4
+  - Filt5
+  - LShelf
+  type: Filter
+- bypassed: null
+  channels:
+  - 0
+  description: null
+  names:
+  - LVolume
+  type: Filter
+- bypassed: null
+  channels:
+  - 1
+  description: null
+  names:
+  - RVolume
+  type: Filter
+processors: null
+title: Base config file for CamDAC
