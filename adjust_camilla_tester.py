@@ -3,17 +3,22 @@ from signal import pause  # one way to nicely not exit
 from camilladsp import CamillaClient
 import sys
 
+# This is not actual code ... it's a playground
+
+
 # see also the done.wait() from here: https://gpiozero.readthedocs.io/en/stable/recipes.html#rotary-encoder
 
 
 port = 1234 # Seems to be the default
 
 
-knob1 = RotaryEncoder(a=17, b=4, max_steps=64)  # Give us 64 possible levels for starters
-knob2 = RotaryEncoder(a=22, b=27, max_steps=64)
-
-button1 = Button(14)
-button2 = Button(24)
+knob1 = RotaryEncoder(a=12, b=13, max_steps=64)  # Give us 64 possible levels for starters
+knob2 = RotaryEncoder(a=7, b=5, max_steps=64)
+knob3 = RotaryEncoder(a=9, b=11, max_steps=64)
+button1 = Button(16,bounce_time=0.1)
+button2 = Button(6,bounce_time=0.1)
+button3 = Button(8,bounce_time=0.1)
+button4 = Button(10,bounce_time=0.1)
 
 # Initialize the rotary encoder's SW pin on GPIO pin 22
 #button = Button(22)
@@ -50,10 +55,25 @@ def button1_press():
 def button2_press():
     print('Button on knob 2')
 
+def button_press(dev):
+    # Testing parameters in the event handlers...
+    print(f'Button: val={dev.value}  devnum={dev.pin.number}')
+
+def knob_adjust_param(dev):
+    # Testing parameters in the event handlers...
+    print(f'Knob: steps={dev.steps}  val={dev.value}   devnum={dev.a.pin} {dev.b.pin}')
+
+
+
 button1.when_pressed = button1_press
 button2.when_pressed = button2_press
+button3.when_pressed = button_press
+button4.when_pressed = button_press
 
-
+knob1.when_rotated = knob1_adjust_param
+knob2.when_rotated = knob2_adjust_param
+knob3.when_rotated = knob_adjust_param
+print(dir(knob3))
 
 try:
     cdsp = CamillaClient("127.0.0.1",port)
