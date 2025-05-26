@@ -10,6 +10,7 @@ OK, a better answer.  CamDAC is a project that lets you construct a device to gi
 - Given that, you can run Shairplay and stream from your iPhone, iPad, etc. or any other Airplay device and have lossless streaming with parametric EQ
 - (soon) You can have USB input and USB output, turning this into an inline digital parametric EQ device
 - Configure this to your heart's content. Got an EQ profile you overall like for your headphones or speakers, but feel, at times, you want a touch more bass or some more "air"?  Have a mood or an album where you just want nothing to do with upper-bass? Assign these filters to the knobs and have this overlay on top of your existing EQ profile.
+- No seriously -- to your heart's content.  Want a knob that simultaneously adds a low-shelf and a high-shelf filter at once (make me a V!)? Want one that adjusts the Q of a filter rather than it's amplitude? Heck, want to turn a knob that both adjusts that V shaped response while also adjusting the Q of the slopes and varies the amplitude of a notch centered on 3.14 kHz? Go for it.  You're strange, sure, but go for it.
 
 
 ## What do I need?
