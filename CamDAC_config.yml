@@ -75,7 +75,7 @@ filters:
   LShelf:
     description: Basic low-shelf -- example of filter that might always be active
     parameters:
-      freq: 1000
+      freq: 120
       gain: 0
       q: 0.707
       type: Lowshelf
