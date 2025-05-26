@@ -2,6 +2,8 @@
 DSP / DAC and headphone amplifier based on a Raspberry Pi and CamillaDSP
 ![CamDAC](images/prototype.jpg)
 
+**Status**: This is in the "tinkerer" phase. Things are up and running just fine (see the notes.md for the current punch-list). But, expect to do things like ssh onto the device to start up the knob control script (`camdac.py`) and use a browser to the onboard Camilla GUI server to re-define your filters. You don't need the Pi physically hooked to anything but USB power.
+
 ## What is it?  Why is it?
 I like knobs. I like EQ. When I started in audio, we EQ'ed with knobs. I yearn for that simpler time. So, I made this overly-complex solution to that problem ;)
 
@@ -18,6 +20,7 @@ You'll need the following to construct the device:
 - A Raspberry Pi 4.  You can likely use others, but it's setup now for the 4B
 - (semi-optional): A DAC HAT. This plugs onto the RPi board and gives you RCA and headphone outputs. It's configured now for the [Raspberry Pi DAC+](https://www.raspberrypi.com/products/dac-plus/) (formerly the IQAudio DAC+). If you use this as a USB gadget only (PEQ on USB in to USB out), you don't need this. But, that's not operational yet, so ...
 - A micro USB card for the RPi.  I got a 64G one for $5 and I've used under 10G on it.
+- USB power for the Pi. I'm using some USB-C Apple wall supply I had around. Max it'll need ever is 3A @ 5V, but I've run it happily on a 1.5A 3V supply.
 - A case: I've provided STL and SCAD files for what I've made
 - Rotary encoders: Just the basic ones (not the modules) are all you need
 - A way to wire the encoders to the GPIO pins. I used a simple off-the-shelf GPIO breadboard that made it easy.  More details are in the `GPIO_lines.md` file. But, you'll need a basic soldering setup
@@ -46,6 +49,8 @@ I did Steps 1-7 but have skipped the Step 8 (gadget mode) for now as I've not go
 While we're here, we have one more thing to do. That guide assumes you're using the headphone jack on the Pi board itself. We're using the much nicer [TI 5122](https://www.ti.com/document-viewer/pcm5122/datasheet) one. To do this, we need to turn off the onboard sound by commenting out the audio with `#dtparam=audio=on` in `/boot/firmware/config.txt`. If you get lost here, check the [RPi DAC docs](https://www.raspberrypi.com/documentation/accessories/audio.html) 
 
 While here, you may want to install Shairport. This lets you Airplay (lossless WiFi) to your box.  That's included in [mdsimon2's Streamer Applications](https://github.com/mdsimon2/RPi-CamillaDSP?tab=readme-ov-file#streamer-applications) section of the instructions.
+
+FWIW, setting up a Remote Desktop (VNC is baked in) is optional. I found it handy when trying to debug my audio devices a bit as it gave an easy way of changing the default, but it really is just optional. For all the development work, I'm just using VSCode and an ssh remote onto the device. Currently, if you do the VNC route, actually use TigerVNC. Remmina and some others have issues.
 
 Once everything is set and you've done a reboot, test it out.  A quick test for Camilla's basic operation and the DAC HAT's operation, try this on the command line: `speaker-test -D hw:Loopback,1 -c 2 -r 44100 -F S32_LE`.  You're telling Linux to send pink noise to the ALSA Loopback device. The `CamDAC_config.yml` that should be running in your Camilla DSP interface is listening on the hw:Loopback and sending to the DAC HAT. In their lingo, the capture device is `hw:0` and the DAC HAT is `hw:CARD=DAC,DEV=0`. A [screencap](images/camilla_config.png) sample running configuration in the Camilla DAC GUI is provided here in the images folder. If things are working, don't worry yet about the other parameters. You're doing your're processing at 88.1k and you're setup to adjust the sample rate as needed. There's plenty of time to geek out on this later after going over the main [Camilla DSP docs](https://github.com/HEnquist/camilladsp)
 

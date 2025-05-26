@@ -6,3 +6,9 @@
 # Software to-do
 - Getting clicks between tracks at least with Shairplay
 - Handle offset / pre-amp gain
+- Run `camdac.py` as a service
+- Add ability to re-define filters more easily
+
+# Hardware to-do
+- USB "gadget" mode for inline digital PEQ
+
