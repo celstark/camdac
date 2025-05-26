@@ -156,7 +156,7 @@ def adjust_filter(owner, dir=0.0):
         return
     new_gain = cur_gain + eq_step * dir
     if DEBUG:
-        print(f'INFO: Adjusting {filt_name} from {cur_gain} dB to {new_gain} dB')
+        print(f"INFO: Adjusting {filt_name} from {cur_gain} dB to {new_gain} dB  [{tmp_conf['filters'][filt_name]['parameters']['freq']} Hz Q={tmp_conf['filters'][filt_name]['parameters']['q']} ]")
     tmp_conf['filters'][filt_name]['parameters']['gain'] = new_gain
     cdsp.config.set_active(tmp_conf)
     
