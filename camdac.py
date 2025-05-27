@@ -183,8 +183,8 @@ knob4.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob4.knob, -1, 
 
 # But, let's have knob 5 be Filt5 as an override
 knob5.name="Filt5"
-knob4.knob.when_rotated_clockwise = lambda: adjust_knob(knob5.knob, 1, knob5)
-knob4.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob5.knob, -1, knob5)
+knob5.knob.when_rotated_clockwise = lambda: adjust_knob(knob5.knob, 1, knob5)
+knob5.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob5.knob, -1, knob5)
 
 
 ######################## CUSTOMIZE UNLIKELY #########################
