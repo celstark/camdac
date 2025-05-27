@@ -17,7 +17,7 @@ Camilla
 '''
 # What does one click of a knob do for each control?
 volume_step = 0.25
-balance_step = 0.05
+balance_step = 0.1
 eq_step = 0.5
 
 DEBUG = 1
@@ -136,13 +136,13 @@ def adjust_balance(steps):
         cdsp.volume.set_volume(2,0)
     elif steps > 0: # Rightwards -- dial left down
         if DEBUG:
-            print(f'INFO: Balance rightwards to {-1.0 * balance_step * steps} dB')
+            print(f'INFO: Balance rightwards to {-1.0 * balance_step * steps} dB {steps}')
         cdsp.volume.set_volume(1, -1.0 * balance_step * steps)
         cdsp.volume.set_volume(2,0)
     elif steps < 0: # Leftwards -- 
         if DEBUG:
-            print(f'INFO: Balance leftwards to {-1.0 * balance_step * steps} dB')
-        cdsp.volume.set_volume(2, -1.0 * balance_step * steps)
+            print(f'INFO: Balance leftwards to {1.0 * balance_step * steps} dB {steps}')
+        cdsp.volume.set_volume(2, 1.0 * balance_step * steps)
         cdsp.volume.set_volume(1,0)
 
 def adjust_filter(owner, dir=0.0):
