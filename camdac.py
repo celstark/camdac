@@ -100,13 +100,13 @@ knob5 = Encoder(
 # Here, we define the funtions under the hood that happen when any knob is 
 # turned or any button is pressed. Don't look here first for customization
 
-def toggle_mode(dev, owner=None):
+def h_toggle_mode(dev, owner=None):
     # Sent but button events -- will swap the "mode" of the dial for that encoder
-    print(f'Button toggle by hold -- before: val={owner.knob.value} steps={owner.knob.steps} devnum={dev.pin.number} name={owner.name}')
+    if DEBUG:
+        print(f'INFO: Button toggle-mode -- name={owner.name}')
     owner.toggle_mode()
-    print(f'                          after: val={owner.knob.value} steps={owner.knob.steps} devnum={dev.pin.number} name={owner.name}')
 
-def adjust_knob(dev, dir=0, owner=None):
+def h_adjust_knob(dev, dir=0, owner=None):
     # Top-level event handler for when a knob is rotated CW - calls appropriate function
     if DEBUG:
         print(f'INFO: Knob adjustment for {owner.name} of {dir}')
@@ -119,6 +119,18 @@ def adjust_knob(dev, dir=0, owner=None):
             adjust_balance(dev.steps)
     else:
         adjust_filter(owner,dir)
+
+def h_reset_filter(dev, owner=None, reset_to_orig=False):
+    # Top-level event handler for resetting the knob (owner) to 0 or the orig_conf value - typically on a button hold
+    newval = 0
+    if reset_to_orig:
+        try:
+            newval = orig_conf['filters'][owner.name]['parameters']['gain']
+        except:
+            print('ERROR: Cannot read original filter gain - setting to 0')
+    if DEBUG:
+        print(f'INFO: Resetting {owner.name} to {newval} dB')
+    adjust_filter(owner,0,newval)
 
 # Here, we send calls to Camilla
 def adjust_volume(dir):
@@ -145,8 +157,9 @@ def adjust_balance(steps):
         cdsp.volume.set_volume(2, 1.0 * balance_step * steps)
         cdsp.volume.set_volume(1,0)
 
-def adjust_filter(owner, dir=0.0):
-    # Using relative adjustments here
+def adjust_filter(owner, dir=0.0, value=None):
+    # If value==None, use relative adjustments to add/sub X dB
+    # If value is specified, set it to that unless dir is also None.
     tmp_conf = cdsp.config.active()
     filt_name=owner.name
     try:
@@ -154,7 +167,7 @@ def adjust_filter(owner, dir=0.0):
     except:
         print(f"ERROR - Cannot retrieve paramters for {filt_name}")
         return
-    new_gain = cur_gain + eq_step * dir
+    new_gain = value if value != None else cur_gain + eq_step * dir
     if DEBUG:
         print(f"INFO: Adjusting {filt_name} from {cur_gain} dB to {new_gain} dB  [{tmp_conf['filters'][filt_name]['parameters']['freq']} Hz Q={tmp_conf['filters'][filt_name]['parameters']['q']} ]")
     tmp_conf['filters'][filt_name]['parameters']['gain'] = new_gain
@@ -166,25 +179,31 @@ def adjust_filter(owner, dir=0.0):
 # Let's make knob1 a volume/balance knob. We don't really need to set the name here as
 # it was set by default above.  But, I'm just showing an over-ride here
 knob1.name="VolBal"
-knob1.knob.when_rotated_clockwise = lambda: adjust_knob(knob1.knob, 1, knob1)
-knob1.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob1.knob, -1, knob1)
-knob1.button.when_pressed = lambda: toggle_mode(knob1.button, knob1)
+knob1.knob.when_rotated_clockwise = lambda: h_adjust_knob(knob1.knob, 1, knob1)
+knob1.knob.when_rotated_counter_clockwise = lambda: h_adjust_knob(knob1.knob, -1, knob1)
+knob1.button.when_pressed = lambda: h_toggle_mode(knob1.button, knob1)
 
-# Let's keep knobs 2-4 to be Filt1-3 and their buttons do nothing. But, we'll still
-# setup the event handler to call adjust_knob, let it know the direction, and the owner
-knob2.knob.when_rotated_clockwise = lambda: adjust_knob(knob2.knob, 1, knob2)
-knob2.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob2.knob, -1, knob2)
+# Let's keep knobs 2-4 to be Filt1-4 and have their buttons, when held, reset the value
+# to whatever we started the code at. That last parameter on the button.when_held controls
+# if it resets to the last running or to 0.  
+# Setup the event handler to call h_adjust_knob, let it know the direction, and the owner
+knob2.knob.when_rotated_clockwise = lambda: h_adjust_knob(knob2.knob, 1, knob2)
+knob2.knob.when_rotated_counter_clockwise = lambda: h_adjust_knob(knob2.knob, -1, knob2)
+knob2.button.when_held = lambda: h_reset_filter(knob2.button,knob2,True)
 
-knob3.knob.when_rotated_clockwise = lambda: adjust_knob(knob3.knob, 1, knob3)
-knob3.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob3.knob, -1, knob3)
+knob3.knob.when_rotated_clockwise = lambda: h_adjust_knob(knob3.knob, 1, knob3)
+knob3.knob.when_rotated_counter_clockwise = lambda: h_adjust_knob(knob3.knob, -1, knob3)
+knob3.button.when_held = lambda: h_reset_filter(knob3.button,knob3,True)
 
-knob4.knob.when_rotated_clockwise = lambda: adjust_knob(knob4.knob, 1, knob4)
-knob4.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob4.knob, -1, knob4)
+knob4.knob.when_rotated_clockwise = lambda: h_adjust_knob(knob4.knob, 1, knob4)
+knob4.knob.when_rotated_counter_clockwise = lambda: h_adjust_knob(knob4.knob, -1, knob4)
+knob4.button.when_held = lambda: h_reset_filter(knob4.button,knob4,True)
 
-# But, let's have knob 5 be Filt5 as an override
-knob5.name="Filt5"
-knob5.knob.when_rotated_clockwise = lambda: adjust_knob(knob5.knob, 1, knob5)
-knob5.knob.when_rotated_counter_clockwise = lambda: adjust_knob(knob5.knob, -1, knob5)
+# Uncomment this, for example and it'd have knob 5 be Filt5 as an override
+# knob5.name="Filt5"
+knob5.knob.when_rotated_clockwise = lambda: h_adjust_knob(knob5.knob, 1, knob5)
+knob5.knob.when_rotated_counter_clockwise = lambda: h_adjust_knob(knob5.knob, -1, knob5)
+knob5.button.when_held = lambda: h_reset_filter(knob5.button,knob5,True)
 
 
 ######################## CUSTOMIZE UNLIKELY #########################
@@ -195,4 +214,5 @@ try:
 except:
     print("Issue connecting to CamillaDSP")
     sys.exit()
+orig_conf = cdsp.config.active()  # Save this so we can reset filters to the values at start
 signal.pause()
