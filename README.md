@@ -2,7 +2,7 @@
 DSP / DAC and headphone amplifier based on a Raspberry Pi and CamillaDSP
 ![CamDAC](images/prototype.jpg)
 
-**Status**: This is in the "tinkerer" phase. Things are up and running just fine (see the notes.md for the current punch-list). But, expect to do things like ssh onto the device to start up the knob control script (`camdac.py`) and use a browser to the onboard Camilla GUI server to re-define your filters. You don't need the Pi physically hooked to anything but USB power if you want to stream to it. But, you can customize the knobs to do whatever aspects of EQ you like.
+**Status**: This is in the "tinkerer" phase. Things are up and running just fine (see the notes.md for the current punch-list). But, expect to do things like ssh onto the device to start up the knob control script (`camdac.py`) and use a browser to the onboard Camilla GUI server to re-define your filters. You don't need the Pi physically hooked to anything but USB power if you want to stream to it. But, you can customize the knobs to do whatever aspects of EQ you like. Heck, you can skip the onboard DAC HAT and just use "Gadget mode" to process from USB to USB.
 
 ## What is it?  Why is it?
 I like knobs. I like EQ. When I started in audio, we EQ'ed with knobs. I yearn for that simpler time. So, I made this overly-complex solution to that problem ;)
@@ -10,7 +10,7 @@ I like knobs. I like EQ. When I started in audio, we EQ'ed with knobs. I yearn f
 OK, a better answer.  CamDAC is a project that lets you construct a device to give your audio system stand-alone, fully-customizable DSP processing for things like parametric EQ. It's based off of a Raspberry Pi running [CamillaDSP](https://github.com/HEnquist/camilladsp), a very efficient DSP processing utility. While it runs in software on Linux, macOS, and Windows (meaning you could just run it in software), CamDAC gives you a physical device with physical adjusters. A few use-modes:
 - Given that this is a Raspbery Pi, it can house our mount network-based music shares and you can have it directly stream from there with parametric EQ pushing audio out the RCA jacks or the headphone jack
 - Given that, you can run Shairplay and stream from your iPhone, iPad, etc. or any other Airplay device and have lossless streaming with parametric EQ
-- (soon) You can have USB input and USB output, turning this into an inline digital parametric EQ device
+- You can have USB input and USB output, turning this into an inline digital parametric EQ device.  See *Gadget Mode* below.
 - Configure this to your heart's content. Got an EQ profile you overall like for your headphones or speakers, but feel, at times, you want a touch more bass or some more "air"?  Have a mood or an album where you just want nothing to do with upper-bass? Assign these filters to the knobs and have this overlay on top of your existing EQ profile.
 - No seriously -- to your heart's content.  Want a knob that simultaneously adds a low-shelf and a high-shelf filter at once (make me a V!)? Want one that adjusts the Q of a filter rather than it's amplitude? Heck, want to turn a knob that both adjusts that V shaped response while also adjusting the Q of the slopes and varies the amplitude of a notch centered on 3.14 kHz? Go for it.  You're strange, sure, but go for it.
 
@@ -101,3 +101,25 @@ The key to note here is that how the knob behaves is goverend by the `name` attr
 A few utilities to help here:
 - `encoder_tester.py`: Lets you watch your encoder events to make sure all is working
 - `fetch_config.py`: Dumps the running configuration to files and shows you an EQAPO style filter configuration
+
+# Gadget mode
+You don't need to use any onboard DAC. You can just as well use the device as an in-line digitial PEQ device. 
+
+- Figure your current DAC's capable modes. If it's plugged into a Linux box `aplay -l` to list the devices. In my case, the Fulla was on card1.  Then, see what modes are supported `cat /proc/asound/card1/stream0`.  So, all typical suspects from 44100 - 384000, 16_LE, 24_3LE, and 32_LE
+
+- Set the RPi up to run in gadget mode and offer up an audio interface. Instructions are ocming from [mdsimon2](https://github.com/mdsimon2/RPi-Camilla). It's also good to have [DeLub's post on ASR](https://www.audiosciencereview.com/forum/index.php?threads/using-a-raspberry-pi-as-equaliser-in-between-an-usb-source-ipad-and-usb-dac.25414/page-3#post-1180356) on hand (we're well past the need to compile anything in that thread though). For now, I'm just going to offer up 44100 like mdsimon2 did 
+```
+echo 'dtoverlay=dwc2' | sudo tee -a /boot/firmware/config.txt > /dev/null
+echo -e 'dwc2\ng_audio' | sudo tee -a /etc/modules > /dev/null
+echo 'options g_audio c_srate=44100 c_ssize=4 c_chmask=3 p_chmask=0' | sudo tee -a /etc/modprobe.d/usb_g_audio.conf > /dev/null 
+
+sudo reboot now
+```
+- Use the USB-C power/data splitter. Power supply goes into power (duh), USB2 data goes to your computer, USB/data goes to Rpi.  On the RPi then, have a USB2 port go to your DAC.  You should get your USB chime.  If you're on a Linux host, you should see a "Linux USB Audio Gadget" with `aplay -l` or `lsusb`. You should see the audio format available as well with `cat /proc/asound/card1/stream0` (change card1 to yoru card number from aplay or lsusb) 
+- On the RPi, we need to setup CamillaDSP to now be able to listen to this input, do its DSP, and then send out.
+  - Run `aplay -L` and look for your DAC. It'll give a big list of possible devices. I've been having Camilla output to `hw:CARD=DAC` to send audio to my RPi DAC.  Look for an "hw" one that shows your device.  Mine is `hw:CARD=Schiit`. It may help to run `aplay -L | grep hw` to filt out and just get the "hw" ones.
+  - In that `aplay -L` you should see `usbstream:CARD=UAC2Gadget` (or possibly hw:UAC2Gadget`)
+  - In the CamillaDSP GUI, head to Files, enter in "gadget" or some such name at the bottom of the Configs panel, hit Save and star it to mark as active.  
+  - In its Devices, set: samplerate=44100 (if you're resampling, you should be able to keep that at your 88200 or whatever you like too), capture device / device = "hw:CARD=UAC2Gadget" (even if it showed as _usbstream_), and Playback device / device = "hw:NAME".  In my case, it was `hw:Schiit` (you can also use `hw:CARD=Schiit`)
+
+FWIW, another great project by [Wang-Yue](https://github.com/Wang-Yue/CamillaDSP-Gadget) is targeted at just this kind of mode of operation, but without hardware knobs.  And we all know, I like knobs.
