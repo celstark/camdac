@@ -16,7 +16,7 @@ Camilla
 
 '''
 # What does one click of a knob do for each control?
-volume_step = 0.25
+volume_step = 0.5
 balance_step = 0.1
 eq_step = 0.5
 
@@ -183,7 +183,7 @@ knob1.knob.when_rotated_clockwise = lambda: h_adjust_knob(knob1.knob, 1, knob1)
 knob1.knob.when_rotated_counter_clockwise = lambda: h_adjust_knob(knob1.knob, -1, knob1)
 knob1.button.when_pressed = lambda: h_toggle_mode(knob1.button, knob1)
 
-# Let's keep knobs 2-4 to be Filt1-4 and have their buttons, when held, reset the value
+# Let's keep knobs 2-5 to be Filt1-4 and have their buttons, when held, reset the value
 # to whatever we started the code at. That last parameter on the button.when_held controls
 # if it resets to the last running or to 0.  
 # Setup the event handler to call h_adjust_knob, let it know the direction, and the owner
