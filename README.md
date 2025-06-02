@@ -18,7 +18,7 @@ OK, a better answer.  CamDAC is a project that lets you construct a device to gi
 ## What do I need?
 You'll need the following to construct the device:
 - A Raspberry Pi 4.  You can likely use others, but it's setup now for the 4B
-- (semi-optional): A DAC HAT. This plugs onto the RPi board and gives you RCA and headphone outputs. It's configured now for the [Raspberry Pi DAC+](https://www.raspberrypi.com/products/dac-plus/) (formerly the IQAudio DAC+). If you use this as a USB gadget only (PEQ on USB in to USB out), you don't need this. But, that's not operational yet, so ...
+- (semi-optional): A DAC HAT. This plugs onto the RPi board and gives you RCA and headphone outputs. It's configured now for the [Raspberry Pi DAC+](https://www.raspberrypi.com/products/dac-plus/) (formerly the IQAudio DAC+). If you use this as a USB gadget only (PEQ on USB in to USB out), you don't need this.
 - A micro USB card for the RPi.  I got a 64G one for $5 and I've used under 10G on it.
 - USB power for the Pi. I'm using some USB-C Apple wall supply I had around. Max it'll need ever is 3A @ 5V, but I've run it happily on a 1.5A 3V supply.
 - A case: I've provided STL and SCAD files for what I've made
