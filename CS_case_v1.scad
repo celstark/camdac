@@ -1,30 +1,15 @@
-include <hinge.scad>
+//include <hinge.scad>
 
 $fn=80;
 
 
 
 
-//*
+//
 //#
-*
-color("yellow")
-translate([-0.8,-move_pi,3])
-translate([-69.3, 44.5, 14])
-scale([25.4, 25.4, 25.4])
-import("hifiberry-dac-plus-adc-1.2.stl"); 
 
 
-
-*
-translate([-10-0.8, -move_pi, 4])
-color("white")
-import("RPi_4_dummy.stl");
-
-*
-xlr_placeholder();
-
-with_xlr=true;
+with_sdslot=true;
 
 bottom_thickness=2.5;
 rpi4_width= 56;
@@ -32,15 +17,12 @@ rpi4_length=85;
 rpi4_edge_to_left_hole=3.5;
 rpi4_edge_to_top_hole=3.5;
 rpi4_edge_to_right_hole=58+3.5;
-xlr_in_front=false;
-xlr_in_side=false;
-xlr_in_side_low=true;
 
-height=with_xlr ? xlr_in_side_low? 39: 66:36;
+//height=with_xlr ? xlr_in_side_low? 39: 66:36;
+height=39;
 length=95.6;
-width= xlr_in_side_low? rpi4_width+bottom_thickness*2+32 : rpi4_width+bottom_thickness*2+3;//with_xlr? height+bottom_thickness : 
-
-
+width = rpi4_width+bottom_thickness*2+32;
+echo ("h: ",height, "w: ",width);
 
 
 
@@ -77,7 +59,7 @@ hole_radius=3.5;
 hole_rim=1.3;
 vertical_hole_rim = 7;
 
-xlr_height=47.5;
+//xlr_height=47.5;
 
 top_rail_thickness=2.5;
 rail_radius=0.9;
@@ -135,7 +117,9 @@ module case() {
         }
                    
         if(part == "all" || part == "case") {
-            sd_card_slot();
+            if (with_sdslot) {
+                sd_card_slot();
+            }
             holes_inner();
             if(top_type=="slide") {
            //     back_lips(0.05);
@@ -154,15 +138,6 @@ module case() {
     }
 }
 
-module neutrik_combo_cut_out(height=2.7) {    
-    //main hole
-    cylinder(d=23.9, center=true, h=height);
-    translate([23/2, 20/2,0])
-    cylinder(d=3.2, center=true, h=height);
-    translate([-23/2,-20/2,0])
-    cylinder(d=3.2, center=true, h=height);
-    
-}
 
 
 module back_lips(extra=0) {
@@ -201,13 +176,13 @@ module back_lips(extra=0) {
     translate_back_right_hole([0,higher_lip_length/2+rpi4_edge_to_top_hole+tolerance,5.3-1.25]) 
     cube([radius*2,higher_lip_length, 2.5], center=true);
     
-    if(xlr_in_side_low) {
-        difference() {
-            translate([0,(lip_length)/2+move_pi/2+bottom_thickness-0.75,bottom_thickness+0.1])
-            cube([length-bottom_thickness*2-vertical_rail_width*2-tolerance, lip_length-radius*2+1.5, bottom_thickness-0.05], center=true);
-            holes_outer(extra=0.13);
-        }
+    //if(1) { //xlr_side_in_low
+    difference() {
+        translate([0,(lip_length)/2+move_pi/2+bottom_thickness-0.75,bottom_thickness+0.1])
+        cube([length-bottom_thickness*2-vertical_rail_width*2-tolerance, lip_length-radius*2+1.5, bottom_thickness-0.05], center=true);
+        holes_outer(extra=0.13);
     }
+    //}
 
 }
 
@@ -297,10 +272,10 @@ module board_supports() {
     }
     
     //left-top hole, bottom support
-    *
-    translate([-length/2+y_distance_from_edge+2, -width/2+x_distance_from_edge-0.05-move_pi, 0])
-    rotate([0,0,90])    
-    board_support();
+//    *
+//    translate([-length/2+y_distance_from_edge+2, -width/2+x_distance_from_edge-0.05-move_pi, 0])
+//    rotate([0,0,90])    
+//    board_support();
 
     //right-top hole, top support    
     if(top_type=="hinge") {
@@ -310,10 +285,11 @@ module board_supports() {
     }
     
     //right-bottom hole, bottom support   
-*    
-    translate([length/2-distance_from_utp+1, -rpi4_width/2+x_distance_from_edge-0.05-move_pi, 0])
-    rotate([0,0,90])    
-    board_support();
+//*    
+//    translate([length/2-distance_from_utp+1, -rpi4_width/2+x_distance_from_edge-0.05-move_pi, 0])
+//    rotate([0,0,90])    
+//    board_support();
+    
     
     //right-top support
     
@@ -674,6 +650,7 @@ module slide_rails(extra_radius=0) {
 }
 
 module pi4_holes_front() {
+    extra_chamfer=1;
     //minijack
     color("white")
     translate([10.8,-width/2+bottom_thickness+0.1,8.4])
@@ -700,7 +677,7 @@ module pi4_holes_front() {
     
     y_translation = -width/2 + bottom_thickness;
      translate([0.8,0,1.25])
-    union() {
+    union() { // DAC IO bits
         // CELS - figured his origin vs. my measurements. I'm indexing on the mounting hole
         // (my read of HFB R RCA is 10.5) and his is 7.  His origin is 7mm left of the R RCA
         // (and 10mm right of the L RCA, giving it a -10 and a -27.1 for the headphone).
@@ -709,59 +686,54 @@ module pi4_holes_front() {
         // I've recoded for the RPi DAC+
         // Note, the headphone jacks are the same height off the deck, but the RCAs aren't
         // His were at 25.7
-        //right rca 
+        //left rca 
         union() {  // was 7
-            translate([-25, y_translation, 23.7])
+            // 1st one here is on the inside
+            translate([-25, y_translation+0.1, 23.7])
             rotate([90,0,0])
-            cylinder(straight_hole_rim, 5.5, 5.5);   
+            cylinder(straight_hole_rim+0.2, 5.5, 5.5);   
             
-            translate([-25, y_translation - straight_hole_rim, 23.7])
+            // 2nd one here is on the outside - makes a touch of chamfer
+            translate([-25, y_translation - straight_hole_rim + 0.0, 23.7])
             rotate([90,0,0])
-            cylinder(2.5-straight_hole_rim+0.1, 5.5, 5.5+extra);    
+            cylinder(2.5-straight_hole_rim+0.1, 5.5, 5.5+extra_chamfer);    
         }
 
-        //left rca
+        //right rca
         union() { // was -10
-            translate([-11, y_translation, 23.7])
+            translate([-11, y_translation+0.1, 23.7])
             rotate([90,0,0])
-            cylinder(straight_hole_rim, 5.5, 5.5);   
+            cylinder(straight_hole_rim+0.2, 5.5, 5.5);   
+            
             translate([-11, y_translation - straight_hole_rim, 23.7])
             rotate([90,0,0])
-            cylinder(2.5-straight_hole_rim+0.1, 5.5, 5.5+extra);
+            cylinder(2.5-straight_hole_rim+0.1, 5.5, 5.5+extra_chamfer);
         
         }
         
         union() { // screw hole -- CELS addition
-            translate([-17.75, y_translation, 31.7])
+            translate([-17.75, y_translation+0.1, 31.7])
             rotate([90,0,0])
-            cylinder(straight_hole_rim, 1.75, 1.75);   
-            translate([-17.75, y_translation - straight_hole_rim, 31.7])
+            cylinder(bottom_thickness+0.2, 1.75, 1.75);   
+            
+            *translate([-17.75, y_translation - straight_hole_rim -0.0, 31.7])
             rotate([90,0,0])
-            cylinder(2.5-straight_hole_rim+0.1, 1.75, 1.75+extra);
+            cylinder(2.5-straight_hole_rim+0.1, 1.75, 1.75+extra_chamfer);
         
         }    
 
         //minijack    
        union() { // was -27.1
-           translate([9, y_translation, 20])
-            rotate([90,0,0])
-            cylinder(straight_hole_rim, 4.5, 4.5);
-            translate([9, y_translation - straight_hole_rim, 20])
-            rotate([90,0,0])
-            cylinder(2.5-straight_hole_rim+0.1, 4.5, 4.5+extra);
+           translate([9, y_translation + 0.1, 20])
+           rotate([90,0,0])
+           cylinder(bottom_thickness + 0.2, 4.5, 4.5);
+           
+           *translate([9, y_translation - straight_hole_rim - 0.0, 20])
+           rotate([90,0,0])
+           cylinder(2.5-straight_hole_rim+0.1, 4.5, 4.5+extra_chamfer);
         }
     }
     
-     if(with_xlr && xlr_in_front) {
-        
-        translate([-4,-width/2+bottom_thickness/2,xlr_height])
-        rotate([90,90,0])
-        neutrik_combo_cut_out(bottom_thickness+2);
-          
-        translate([28,-width/2+bottom_thickness/2,xlr_height])
-        rotate([90,90,0])
-        neutrik_combo_cut_out(bottom_thickness+2);
-    }
       
 }
 
@@ -784,78 +756,10 @@ module pi4_holes_side() {
     rotate([0,90,0])    
     cube([16,15.5, bottom_thickness+0.2], true);         
     
-     if(with_xlr) {
-        if(xlr_in_side) {        
-            translate([length/2-bottom_thickness/2,-12-move_pi,xlr_height-5])
-            rotate([0,90,0])
-            neutrik_combo_cut_out(bottom_thickness+2);
-              
-            translate([length/2-bottom_thickness/2,14-move_pi,xlr_height-5])
-            rotate([0,90,0])
-            neutrik_combo_cut_out(bottom_thickness+2);
-        } else if (false) { // CELS - xlr_in_side_low
-            
-            translate([length/2-bottom_thickness/2,28,22])
-            rotate([0,90,0])
-            neutrik_combo_cut_out(bottom_thickness+2);
-              
-            translate([-length/2+bottom_thickness/2,28,22])
-                        rotate([90,0,0])
-            rotate([0,90,0])
-            neutrik_combo_cut_out(bottom_thickness+2);
-        }
-    }
-    
     
 }
 
 
-module xlr_placeholder() {
-    if(with_xlr) {
-        if(xlr_in_front) {
-            z=24+4.5;
-            translate([-4,-width/2+z/2+bottom_thickness,xlr_height])
-            rotate([90,0,0])
-            cube([30, 27, 24+4.5], center=true);
-            translate([28,-width/2+z/2+bottom_thickness,xlr_height])
-            rotate([90,0,0])
-            cube([30, 27, 24+4.5], center=true);
-        }
-   
-        if(xlr_in_side) {
-
-            translate([length/2-bottom_thickness/2,-12-move_pi,xlr_height-5])
-            rotate([90,0,90])
-            single_xlr_placeholder();
-            translate([length/2-bottom_thickness/2,14-move_pi,xlr_height-5])
-            rotate([90,0,90])  
-           single_xlr_placeholder(); 
-            
-       }
-        if (xlr_in_side_low) {
-            
-            translate([length/2-bottom_thickness/2,28,22])
-            rotate([0,90,0])
-            single_xlr_placeholder();
-              
-            translate([-length/2+bottom_thickness/2,28,22])
-            rotate([0,180,0])
-            rotate([0,90,0])
-            single_xlr_placeholder();
-        }
-    }
-}
-
-module single_xlr_placeholder() {
-    translate([0,0,-24/2])  
-    union() {
-        color("#330033")
-        cube([30, 27, 24], center=true);
-        translate([0,-1,-24/2-4.5/2])
-        color("white")
-        cube([23, 23, 4.5], center=true);
-    }
-}
 
 module sd_card_slot() {
     translate([-length/2,pi_move[1],0])
