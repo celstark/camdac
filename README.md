@@ -123,3 +123,14 @@ sudo reboot now
   - In its Devices, set: samplerate=44100 (if you're resampling, you should be able to keep that at your 88200 or whatever you like too), capture device / device = "hw:CARD=UAC2Gadget" (even if it showed as _usbstream_), and Playback device / device = "hw:NAME".  In my case, it was `hw:Schiit` (you can also use `hw:CARD=Schiit`)
 
 FWIW, another great project by [Wang-Yue](https://github.com/Wang-Yue/CamillaDSP-Gadget) is targeted at just this kind of mode of operation, but without hardware knobs.  And we all know, I like knobs.
+
+# Displays
+There are a few ways to add a display. If you want something full-featured, we've always got the HDMI outputs. But, we can make a simple display out of an LCD or LED module using the I2C protocol. A great thing about this is that the same pair of data lines that the DAC module uses for basic communication can be used here as the protocol supports multiple devices, so long as they've got different IDs. I used `RPi_I2C_driver.py` from [DenisFromHR](https://gist.github.com/DenisFromHR/cc863375a6e19dce359d) here for the 1602, but there are loads of options.
+
+## Display options
+I've tried out both a generic 1602 (16x2 LCD; seems to be a [Z-0234](https://wiki.52pi.com/index.php?title=Z-0234)) modules and a generic 128x32 OLED (based on an SSD1306 chip)). The 1602 setup is designed to run off of 5V, but there's some concern (not sure if warranted) that powering by 5V and running your data lines on the 3.3V the Pi wants will be an issue (it comes down to if things are pull up vs pull down). You can logic-level convert or you can just get a module with a contrast adjustment knob, run the module at 3.3V and dial the contrast knob all the way down.  The display shows fine that way.  The 128x32 pixel OLEDs seem designed to run on 3.3V.
+
+Honestly, the 128x32 OLED seems more a pain than it's worth. The one I got is tiny and you really need to treat it like an image device. The adafruit-circuitpython-ssd1306 library seems nice enough and if you want something fancy like showing the EQ curve, this would be the right approach.  The 1602 works for what I want.
+
+## Finding your display's ID
+Hook up the display (SDA, and SCL lines will be shared with the DAC; 3.3V and GND are the only others needed), power up the Pi and run `sudo i2cdetect -y 1`.  You'll likely see a "UU" in the resulting matrix that you can read out as being in location 4c. That just means we've got a driver loaded for a device at that address.  That's the I2C address of the DAC.  See a hex code somewhere else? That's the address of your display.  My 1602 comes up on 0x27 and the 128x32 OLED comes up on 0x3c. If you're not on 0x27, edit the `RPi_I2C_driver.py` file.

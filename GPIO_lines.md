@@ -16,6 +16,9 @@ To simplify the wiring a bit, for the 5-encoder + switch version I've grouped th
 
 So, in the code, for example, the right-most encoder knob, #5, uses pins 27 (A) and 22 (B) for the dial and 23 for the switch.
 
+## I2C
+Note, we can use the same I2C lines that the DAC is using for an optional display
+
 # Resistors and wiring
 We can likely get away without using pull-up resistors and just make sure the internal ones are enabled. The Pi has ~50k resistors baked into it, but its input impedance isn't far off that. For "strong" setting of the IO pins capable of working in noisy environments (e.g., with longer cable runs), you may want the resistor to be a tenth the input impedance and the internal ones are closer then to 1:1.  Ignoring them does simplify the hardware a touch as the board I picked does make including them not very elegant. Note, if you use modules rather than raw encoders, these typically have 10k resistors going between the Vcc and the junction between the data lines (CLK, DT, and SW) and their respective switches (the other end of each switch is on GND). Thus, the modules, are in a pull-up state and when the switches close, it gets pulled down.
 
@@ -27,4 +30,6 @@ If using basic encoders (non-modules):
 - Strip ~2cm off another wire and use that to connect the "C" terminal (middle of the 3) and one side of the switch (either of the 2) thus jumpering them on the encoder end. Bring that wire and hook to the ground bus
 - Solder a wire to the other end of the switch (the one you didn't jumper above) and hook that to the third number above.
 
-  
+
+
+
