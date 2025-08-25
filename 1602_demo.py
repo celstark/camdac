@@ -30,6 +30,8 @@ frq_active=False
 q_active=False
 db_active=True
 symbol_act=chr(126)
+symbol_act=chr(94)
+symbol_act=chr(255)
 bl_status=1
 
 TL=f"{pot} {frq:5} {db:+1.1f} {q:3.1f}"

@@ -1,7 +1,7 @@
 
 # Case to improve
-- You need to remove the SD card to get the board in and out.  1 mm more and we'd clear
-- Different knobs, 4 controls, or a bit bigger case -- it's a bit cramped
+- ~~You need to remove the SD card to get the board in and out.  1 mm more and we'd clear~~
+- ~~Different knobs, 4 controls, or a bit bigger case -- it's a bit cramped~~
 
 # Software to-do
 - Getting clicks between tracks at least with Shairplay. (Seems to be tied to the DAC HAT)
@@ -12,6 +12,7 @@
 
 # Hardware to-do
 - ~~USB "gadget" mode for inline digital PEQ~~
+- ~~Add display for feedback~~
 
 -----------
 Desktop audio not working -- https://github.com/HEnquist/camilladsp-config

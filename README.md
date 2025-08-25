@@ -4,6 +4,8 @@ DSP / DAC and headphone amplifier based on a Raspberry Pi and CamillaDSP
 
 **Status**: This is in the "tinkerer" phase. Things are up and running just fine (see the notes.md for the current punch-list). But, expect to do things like ssh onto the device to start up the knob control script (`camdac.py`) and use a browser to the onboard Camilla GUI server to re-define your filters. You don't need the Pi physically hooked to anything but USB power if you want to stream to it. But, you can customize the knobs to do whatever aspects of EQ you like. Heck, you can skip the onboard DAC HAT and just use "Gadget mode" to process from USB to USB.
 
+**August 2025**: Big update here is the addition of a display, a new case to go along with it, and allowing the filter knobs to switch what aspect you're controling (gain, freq, Q, and type)
+
 ## What is it?  Why is it?
 I like knobs. I like EQ. When I started in audio, we EQ'ed with knobs. I yearn for that simpler time. So, I made this overly-complex solution to that problem ;)
 
@@ -13,6 +15,7 @@ OK, a better answer.  CamDAC is a project that lets you construct a device to gi
 - You can have USB input and USB output, turning this into an inline digital parametric EQ device.  See *Gadget Mode* below.
 - Configure this to your heart's content. Got an EQ profile you overall like for your headphones or speakers, but feel, at times, you want a touch more bass or some more "air"?  Have a mood or an album where you just want nothing to do with upper-bass? Assign these filters to the knobs and have this overlay on top of your existing EQ profile.
 - No seriously -- to your heart's content.  Want a knob that simultaneously adds a low-shelf and a high-shelf filter at once (make me a V!)? Want one that adjusts the Q of a filter rather than it's amplitude? Heck, want to turn a knob that both adjusts that V shaped response while also adjusting the Q of the slopes and varies the amplitude of a notch centered on 3.14 kHz? Go for it.  You're strange, sure, but go for it.
+- *Remember, you can have more filters than knobs*. For example, I've got mine setup right now with 6 filters for my headphones as the basic starting point. In addition to those, I've got 4 more filter knobs giving me several different shelf or peaking filters to play around with. So, I start off with my current go-to EQ setup for these headphones, but have other adjustments I can add in (in addition to giving volume and balance knobs).
 
 
 ## What do I need?
@@ -46,6 +49,8 @@ I did Steps 1-7 but have skipped the Step 8 (gadget mode) for now as I've not go
 1) **For Sep 7, Enable ALSA Loopback**, you are running in ALSA mode. So, setup that loopback
 2) **When it comes to Step 9, Assign the Active Configuration**, use the `CamDAC_config.yml` file here. It's got all you need to get going (see below) 
 
+Note, if you've followed the dfault paths here, on your host machine, you should be able to connect to the CamillaDSP GUI using a web browser on port 5005. This can be super, super handy as you can monitor just what's going on with Camilla.
+
 While we're here, we have one more thing to do. That guide assumes you're using the headphone jack on the Pi board itself. We're using the much nicer [TI 5122](https://www.ti.com/document-viewer/pcm5122/datasheet) one. To do this, we need to turn off the onboard sound by commenting out the audio with `#dtparam=audio=on` in `/boot/firmware/config.txt`. If you get lost here, check the [RPi DAC docs](https://www.raspberrypi.com/documentation/accessories/audio.html) 
 
 While here, you may want to install Shairport. This lets you Airplay (lossless WiFi) to your box.  That's included in [mdsimon2's Streamer Applications](https://github.com/mdsimon2/RPi-CamillaDSP?tab=readme-ov-file#streamer-applications) section of the instructions.
@@ -53,6 +58,8 @@ While here, you may want to install Shairport. This lets you Airplay (lossless W
 FWIW, setting up a Remote Desktop (VNC is baked in) is optional. I found it handy when trying to debug my audio devices a bit as it gave an easy way of changing the default, but it really is just optional. For all the development work, I'm just using VSCode and an ssh remote onto the device. Currently, if you do the VNC route, actually use TigerVNC. Remmina and some others have issues.
 
 Once everything is set and you've done a reboot, test it out.  A quick test for Camilla's basic operation and the DAC HAT's operation, try this on the command line: `speaker-test -D hw:Loopback,1 -c 2 -r 44100 -F S32_LE`.  You're telling Linux to send pink noise to the ALSA Loopback device. The `CamDAC_config.yml` that should be running in your Camilla DSP interface is listening on the hw:Loopback and sending to the DAC HAT. In their lingo, the capture device is `hw:0` and the DAC HAT is `hw:CARD=DAC,DEV=0`. A [screencap](images/camilla_config.png) sample running configuration in the Camilla DAC GUI is provided here in the images folder. If things are working, don't worry yet about the other parameters. You're doing your're processing at 88.1k and you're setup to adjust the sample rate as needed. There's plenty of time to geek out on this later after going over the main [Camilla DSP docs](https://github.com/HEnquist/camilladsp)
+
+
 
 ## Install pyCamillaDSP
 The code here uses [pyCamillaDSP](https://henquist.github.io/pycamilladsp/config/) as a Python front-end to Camilla's web-sockets so we can control Camilla. If that means nothing to you, forget I typed it. We need a Python library to be installed so that our code can work. Unlike a simple pip-based install, this *really* wants to be in a virtual environment and not be installed into the main system python. Here's how you do that and install the library (make sure though to include the system packages or you'll miss out on all the RPi bits we need).
