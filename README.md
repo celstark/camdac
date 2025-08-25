@@ -5,6 +5,7 @@ DSP / DAC and headphone amplifier based on a Raspberry Pi and CamillaDSP
 **Status**: This is in the "tinkerer" phase. Things are up and running just fine (see the notes.md for the current punch-list). But, expect to do things like ssh onto the device to start up the knob control script (`camdac.py`) and use a browser to the onboard Camilla GUI server to re-define your filters. You don't need the Pi physically hooked to anything but USB power if you want to stream to it. But, you can customize the knobs to do whatever aspects of EQ you like. Heck, you can skip the onboard DAC HAT and just use "Gadget mode" to process from USB to USB.
 
 **August 2025**: Big update here is the addition of a display, a new case to go along with it, and allowing the filter knobs to switch what aspect you're controling (gain, freq, Q, and type)
+![CamDAC](images/proto_w_display.jpg)
 
 ## What is it?  Why is it?
 I like knobs. I like EQ. When I started in audio, we EQ'ed with knobs. I yearn for that simpler time. So, I made this overly-complex solution to that problem ;)
