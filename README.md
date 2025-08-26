@@ -46,7 +46,7 @@ sudo wget https://raw.githubusercontent.com/mdsimon2/RPi-CamillaDSP/main/camilla
 ... (keep going )
 
 ```
-I did Steps 1-7 but have skipped the Step 8 (gadget mode) for now as I've not got the required hardware yet. Two big things:
+I did Steps 1-7 but skipped Step 8 (gadget mode) initially as I didn't have the required hardware (See below -- it's running now). Two big things:
 1) **For Sep 7, Enable ALSA Loopback**, you are running in ALSA mode. So, setup that loopback
 2) **When it comes to Step 9, Assign the Active Configuration**, use the `CamDAC_config.yml` file here. It's got all you need to get going (see below) 
 
@@ -85,7 +85,7 @@ Once built, you'll want to make sure the encoders are working correctly.  The su
 Still here?  Now, for the fun.  It's time to make those knobs do what you want.  There are two places to work in and consider here: the `camdac.py` file that actually talks to CamillaDSP and the `CamDAC_config.yml` file.
 
 ## The CamDAC_config.yml file
-This is the configuration file for CamillaDSP tied to the project. After installing Camilla DSP, copy it into the `~camilladsp/configs/` folder if it's not already there from above.  Assuming you've got the [CamillaDSP GUI](http://raspberrypi.local:5005/gui) running (you did install that above right?), go to the Files tab, load this up and set it to be "active" (starred)
+This is the configuration file for CamillaDSP tied to the project. After installing Camilla DSP, copy it into the `~camilladsp/configs/` folder if it's not already there from above.  Assuming you've got the CamillaDSP GUI running (you did install that above right? - it'll be somewhere like http://raspberrypi.local:5005/gui), go to the Files tab, load this up and set it to be "active" (starred)
 
 You can customize this in a text editor or in the CamillaDSP GUI. There are a few key bits here:
 - We have filters named "Filt1", "Filt2", ... "Filt5".  These are ones, by default, configured to be accessible by `camdac.py` and be adjusted with the knobs. You can use different names if you like, but just know that `camdac.py` needs to send configuration updates for the active config that match these names.  Best to set their default gain, initially at least, to zero. But, **here is where you actually set things like the frequency and Q**.  The `camdac.py`, by default, just changes the amplitude of these filters.
